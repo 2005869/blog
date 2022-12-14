@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.views.generic import ListView
 from . import models
 
 
 # Create your views here.
+'''
 def post_list(request):
     object_list = models.Post.published.all()
     paginator = Paginator(object_list, 3)
@@ -15,6 +17,7 @@ def post_list(request):
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
     return render(request, 'blogapp/post/list.html', {'posts': posts, 'page': page})
+'''
 
 
 def post_detail(request, year, month, day, post):
@@ -25,3 +28,10 @@ def post_detail(request, year, month, day, post):
                              publish__month=month,
                              publish__day=day)
     return render(request, 'blogapp/post/detail.html', {'post': post})
+
+
+class PostListView(ListView):
+    queryset = models.Post.published.all()
+    context_object_name = 'posts'
+    paginate_by = 3
+    template_name = 'blogapp/post/list.html'
