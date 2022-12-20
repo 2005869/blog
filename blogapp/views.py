@@ -2,14 +2,21 @@ from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.views.generic import ListView
+from taggit.models import Tag
 from . import forms
 from . import models
 
 
 # Create your views here.
-'''
-def post_list(request):
+
+def post_list(request, tag_slug=None):
     object_list = models.Post.published.all()
+    tag = None
+
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        object_list = object_list.filter(tags__in=[tag])
+
     paginator = Paginator(object_list, 3)
     page = request.GET.get('page')
     try:
@@ -18,8 +25,8 @@ def post_list(request):
         posts = paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blogapp/post/list.html', {'posts': posts, 'page': page})
-'''
+    return render(request, 'blogapp/post/list.html', {'posts': posts, 'page': page, 'tag': tag})
+
 
 
 def post_detail(request, year, month, day, post):
