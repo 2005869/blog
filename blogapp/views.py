@@ -29,7 +29,23 @@ def post_detail(request, year, month, day, post):
                              publish__year=year,
                              publish__month=month,
                              publish__day=day)
-    return render(request, 'blogapp/post/detail.html', {'post': post})
+
+    # list actives comments for this post
+    comments = post.comments.filter(active=True)
+
+    new_comment = None
+
+    if request.method == 'POST':
+        comment_form = forms.CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+    else:
+        comment_form = forms.CommentForm()
+    return render(request, 'blogapp/post/detail.html', {'post': post,
+                                                        'comments': comments,
+                                                        'comment_form': comment_form})
 
 
 class PostListView(ListView):
